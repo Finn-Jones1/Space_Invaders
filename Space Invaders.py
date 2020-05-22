@@ -19,22 +19,22 @@ pygame.display.set_caption('Space Invaders')
 
 black = (0,0,0)
 white = (255,255,255)
-enemySpeed = 15
-enemySpacing = 100
+enemySpeed = 6
+enemySpacing = 50
 stop = False
 enemyImg = []
 Ex = []
 Ey = []
 eChangeX = []
 eChangeY = []
-numEnemies = 6
+numEnemies = 15
 for i in range(numEnemies):
     enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
     eChangeX.append(enemySpeed)
     eChangeY.append(10)
     Ex.append(100 + enemySpacing * i)
     Ey.append(100)
-EnemyW = 55
+EnemyW = 28
 EnemyL = 78
 
 x =  (display_width * 0.45)
@@ -102,25 +102,31 @@ while not stop:
         for i in range(numEnemies):
             if Ey[i] > missileY:
                 print("y crossover")
-                if Ex[i] < missileX and Ex[i] > missileX - 59:
-                    hitList.append(str(i))
-                    Shot = True
-                    missileFire = "ready"
-                    print("x crossover")
+                if Ex[i] < missileX and Ex[i] > missileX - 28:
+                    if str(i) not in hitList:
+
+                        hitList.append(str(i))
+                        print(hitList)
+                        Shot = True
+                        missileFire = "ready"
+                        print("x crossover")
 
 
     x += x_change
 
+
     # if Shot == False:
     for i in range(numEnemies):
-        if str(i) not in str(hitList) :
-            Ex[i] += eChangeX[i] 
+        if str(i) not in str(hitList):
+            Ex[i] += eChangeX[i]
             enemy(Ex[i],Ey[i], i)
 
         if Ex[i] > display_width - 65:
+            Ey[i] = Ey[i] + 100
             eChangeX[i] = -enemySpeed
         
         if Ex[i] < 0 - 20:
+            Ey[i] = Ey[i] + 100
             eChangeX[i] = enemySpeed
 
 
