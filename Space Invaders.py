@@ -10,7 +10,7 @@ display_width = 1000
 display_height = 700
 Shot = False
 
-
+pygame.joystick.init()
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
@@ -19,7 +19,7 @@ pygame.display.set_caption('Space Invaders')
 
 black = (0,0,0)
 white = (255,255,255)
-enemySpeed = 6
+enemySpeed = 0
 enemySpacing = 50
 stop = False
 enemyImg = []
@@ -79,6 +79,10 @@ while not stop:
                     missileX = x + 20
                     missileY = y
                 missileFire = "fire"
+            elif event.type == pygame.JOYBUTTONDOWN:
+                print("Joystick button pressed.")
+            elif event.type == pygame.JOYBUTTONUP:
+                print("Joystick button released.")
 
 
         if event.type == pygame.KEYUP:
