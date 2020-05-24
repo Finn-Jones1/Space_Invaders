@@ -48,7 +48,6 @@ missileFire = "ready"
 # walkCount = 0
 
 
-hitList = []
 
 def player(x,y):
     gameDisplay.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
@@ -60,12 +59,21 @@ def fireMisslie(x,y):
     gameDisplay.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
 
 
-     
+hitList = []
+
 
 while not stop:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             stop = True
+        if event.type == pygame.JOYBUTTONDOWN:
+                if missileFire == "ready":
+                    missileX = x + 20
+                    missileY = y
+                missileFire = "fire"
+        #     print("Joystick button pressed.")
+        # if event.type == pygame.JOYBUTTONUP:
+        #     print("Joystick button released.")
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
@@ -79,19 +87,31 @@ while not stop:
                     missileX = x + 20
                     missileY = y
                 missileFire = "fire"
-            elif event.type == pygame.JOYBUTTONDOWN:
-                print("Joystick button pressed.")
-            elif event.type == pygame.JOYBUTTONUP:
-                print("Joystick button released.")
-
-
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
                 x_change += playerSpeed
             elif event.key == pygame.K_d:
                 x_change -= playerSpeed
-
+        
     gameDisplay.fill(black)
+
+
+
+    joystick_count = pygame.joystick.get_count()
+
+    for i in range(joystick_count):
+        joystick = pygame.joystick.Joystick(i)
+        joystick.init()
+        axis = joystick.get_axis(0)
+
+    
+    if axis > 0.5:
+        x = x + playerSpeed
+    elif axis == -1.0:
+        x = x - playerSpeed
+
+
+
 
 
 
@@ -107,9 +127,9 @@ while not stop:
             if Ey[i] > missileY:
                 print("y crossover")
                 if Ex[i] < missileX and Ex[i] > missileX - 28:
-                    if str(i) not in hitList:
+                    if i != hitList:
 
-                        hitList.append(str(i))
+                        hitList.append(i)
                         print(hitList)
                         Shot = True
                         missileFire = "ready"
@@ -121,9 +141,12 @@ while not stop:
 
     # if Shot == False:
     for i in range(numEnemies):
-        if str(i) not in str(hitList):
-            Ex[i] += eChangeX[i]
-            enemy(Ex[i],Ey[i], i)
+        for p in hitlist:
+            if i != p:
+                print(i)
+                print(p)
+                Ex[i] += eChangeX[i]
+                enemy(Ex[i],Ey[i], i)
 
         if Ex[i] > display_width - 65:
             Ey[i] = Ey[i] + 100
