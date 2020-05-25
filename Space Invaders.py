@@ -19,7 +19,7 @@ pygame.display.set_caption('Space Invaders')
 
 black = (0,0,0)
 white = (255,255,255)
-enemySpeed = 0
+enemySpeed = 4
 enemySpacing = 50
 stop = False
 enemyImg = []
@@ -47,7 +47,7 @@ missileY_change = -30
 missileFire = "ready"
 # walkCount = 0
 
-
+axis = ''
 
 def player(x,y):
     gameDisplay.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
@@ -60,7 +60,6 @@ def fireMisslie(x,y):
 
 
 hitList = []
-
 
 while not stop:
     for event in pygame.event.get():
@@ -124,29 +123,23 @@ while not stop:
         fireMisslie(missileX,missileY)
         missileY += missileY_change
         for i in range(numEnemies):
-            if Ey[i] > missileY:
+            if Ey[i]+ 10 > missileY:
                 print("y crossover")
-                if Ex[i] < missileX and Ex[i] > missileX - 28:
-                    if i != hitList:
-
+                if Ex[i] < missileX and Ex[i] + 10  > missileX:
+                    # print(i)
+                    if i not in hitList:
                         hitList.append(i)
-                        print(hitList)
+                        # print(hitList)
                         Shot = True
                         missileFire = "ready"
                         print("x crossover")
 
-
-    x += x_change
-
-
-    # if Shot == False:
     for i in range(numEnemies):
-        for p in hitlist:
-            if i != p:
-                print(i)
-                print(p)
-                Ex[i] += eChangeX[i]
-                enemy(Ex[i],Ey[i], i)
+        if i not in hitList:
+            
+            # print(i)
+            Ex[i] += eChangeX[i]
+            enemy(Ex[i],Ey[i], i)
 
         if Ex[i] > display_width - 65:
             Ey[i] = Ey[i] + 100
@@ -155,6 +148,17 @@ while not stop:
         if Ex[i] < 0 - 20:
             Ey[i] = Ey[i] + 100
             eChangeX[i] = enemySpeed
+
+    x += x_change
+
+
+    # if Shot == False:
+    # for i in hitList:
+    #     print(i)
+
+    # for i in range(numEnemies):
+    #     # print(hitList)
+        
 
 
     player(x,y)
