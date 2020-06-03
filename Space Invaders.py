@@ -46,8 +46,20 @@ def enemy(x,y,i):
 def fireMisslie(x,y):
     gameDisplay.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
 
-def textDisplay(text):
-    text = pygame.font.Font(FlexyPath + 'Quicksand-VariableFont_wght.ttf', 110)
+# def textDisplay(text):
+#     text = pygame.font.Font(FlexyPath + 'Quicksand-VariableFont_wght.ttf', 110)
+
+
+def textRender(text, font):
+    textSurface = font.render(text, True, white)
+    return textSurface, textSurface.get_rect()
+
+def showText(text, fontSize):
+    Font = pygame.font.Font(FlexyPath+'/Quicksand-VariableFont_wght.ttf', fontSize)
+    finalText, textLoc = textRender(text, Font)
+    textLoc = (10,0)
+    gameDisplay.blit(finalText, textLoc)
+
 
 
 def gameLoop():
@@ -63,6 +75,7 @@ def gameLoop():
     EnemyL = 78
     missileY_change = -30
     missileFire = "ready"
+    joyConnect = "false"
 
     stop = False
     while not stop:
@@ -74,9 +87,9 @@ def gameLoop():
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
-            #     print("Joystick button pressed.")
-            # if event.type == pygame.JOYBUTTONUP:
-            #     print("Joystick button released.")
+                    # joyConnect = "true"
+                    
+
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
@@ -98,7 +111,7 @@ def gameLoop():
             
         gameDisplay.fill(black)
 
-
+        showText('Score: ' + str(len(hitList)), 50)
 
         joystick_count = pygame.joystick.get_count()
 
@@ -107,7 +120,7 @@ def gameLoop():
             joystick.init()
             axis = joystick.get_axis(0)
 
-        
+        # if joyConnect == "true":
         if axis > 0.5:
             x = x + playerSpeed
         elif axis == -1.0:
@@ -148,7 +161,7 @@ def gameLoop():
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
 
-            if Ex[i] > display_width - 100:
+            if Ex[i] > display_width - 10:
                 Ey[i] = Ey[i] + 100
                 eChangeX[i] = -enemySpeed
             
