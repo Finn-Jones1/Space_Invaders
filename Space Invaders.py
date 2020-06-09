@@ -20,19 +20,39 @@ black = (0,0,0)
 white = (255,255,255)
 enemySpeed = 4
 enemySpacing = 50
-
+eMissileChange = 30
 enemyImg = []
 Ex = []
 Ey = []
 eChangeX = []
 eChangeY = []
+eMissile = []
+XeMissile = []
+YeMissile = []
+eMChangeX = []
+eMChangeY = []
+eMissileFire = []
+eMX = []
+eMY = []
 numEnemies = 15
+
 for i in range(numEnemies):
+
+
     enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
     eChangeX.append(enemySpeed)
     eChangeY.append(10)
     Ex.append(100 + enemySpacing * i)
     Ey.append(100)
+
+    eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+    # eMChangeX.append(enemySpeed)
+    eMChangeY.append(eMissileChange)
+    eMissileFire.append("ready")
+    eMX.append(100)
+    eMY.append(100)
+    
+
 
 # walkCount = 0
 
@@ -45,6 +65,10 @@ def enemy(x,y,i):
 
 def fireMisslie(x,y):
     gameDisplay.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
+
+def eFireMisslie(x,y,i):
+    gameDisplay.blit((eMissile[i]), (x,y))
+
 
 # def textDisplay(text):
 #     text = pygame.font.Font(FlexyPath + 'Quicksand-VariableFont_wght.ttf', 110)
@@ -70,11 +94,12 @@ def gameLoop():
     x_change = 0
     axis = ''
     missileY = 0
-    playerSpeed = 15
+    playerSpeed = 20
     EnemyW = 28
     EnemyL = 78
     missileY_change = -30
     missileFire = "ready"
+
     joyConnect = "false"
 
     stop = False
@@ -86,6 +111,12 @@ def gameLoop():
                     if missileFire == "ready":
                         missileX = x + 28
                         missileY = y
+                        for i in range(numEnemies):
+                            eMX[i] = Ex[i]
+                            eMY[i] = Ey[i]
+                            eMissileFire[i] = "fire"
+                    
+
                     missileFire = "fire"
                     # joyConnect = "true"
                     
@@ -122,9 +153,10 @@ def gameLoop():
 
         # if joyConnect == "true":
         if axis > 0.5:
-            x = x + playerSpeed
-        elif axis == -1.0:
-            x = x - playerSpeed
+            x = x + playerSpeed * axis
+        elif axis < 0:
+            x = x + playerSpeed * axis
+
 
 
 
@@ -168,7 +200,11 @@ def gameLoop():
             if Ex[i] < 0 - 30:
                 Ey[i] = Ey[i] + 100
                 eChangeX[i] = enemySpeed
-
+            
+            if eMissileFire[i] == "fire":
+                eFireMisslie(eMX[i],eMY[i], i)
+                
+                eMY[i] += eMissileChange
 
 
         x += x_change
