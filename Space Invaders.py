@@ -18,7 +18,7 @@ pygame.display.set_caption('Space Invaders')
 
 black = (0,0,0)
 white = (255,255,255)
-enemySpeed = 4
+enemySpeed = 0
 enemySpacing = 50
 eMissileChange = 30
 enemyImg = []
@@ -84,7 +84,9 @@ def showText(text, fontSize):
     textLoc = (10,0)
     gameDisplay.blit(finalText, textLoc)
 
-
+def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
+    if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
+        return True
 
 def gameLoop():
     Shot = False
@@ -150,16 +152,17 @@ def gameLoop():
 
         # if joyConnect == "true":
 
-        if axis > 0.5:
-            x = x + playerSpeed * axis
-        elif axis < -0.01:
-            x = x + playerSpeed * axis
+        # if axis > 0.5:
+        #     x = x + playerSpeed * axis
+        # elif axis < -0.01:
+        #     x = x + playerSpeed * axis
 
 
 
 
 
 
+            
 
 
 
@@ -170,29 +173,25 @@ def gameLoop():
             fireMisslie(missileX,missileY)
             missileY += missileY_change
             for i in range(numEnemies):
-                if Ey[i] + 40 > missileY:
-                    print("y crossover")
-                    if Ex[i] - 15 < missileX and Ex[i] + 30 > missileX and Ey[i] + 100 > missileY and Ey[i] < missileY:
+                # if Ey[i] + 40 > missileY:
+                print("y crossover")
+                if hitDetect(Ex[i],Ey[i], missileX, missileY, 15, 30, 20) is True:
+                    if i not in hitList:
+                        hitList.append(i)
+                        Shot = True
+                        missileFire = "ready"
+                        print("x crossover")
 
-                        # print(i)
-                        if i not in hitList:
-                            hitList.append(i)
-                            # print(hitList)
-                            Shot = True
-                            missileFire = "ready"
-                            print("x crossover")
 
 
 
         for i in range(numEnemies):
             if i not in hitList:
                 
-                # print(i)
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
 
-                hello = random.randint(0,1)
-                # print(hello)
+                hello = random.randint(0,100)
 
                 if hello == 1:
                     if eMissileFire[i] != "fire":
@@ -200,7 +199,8 @@ def gameLoop():
                         eMY[i] = Ey[i]
                         eMissileFire[i] = "fire"
                 if eMY[i] > 700:
-                    eMissileFire[i] = "fire"
+                    eMissileFire[i] = "ready"
+
             if Ex[i] > display_width - 10:
                 Ey[i] = Ey[i] + 100
                 eChangeX[i] = -enemySpeed
@@ -210,13 +210,17 @@ def gameLoop():
                 eChangeX[i] = enemySpeed
             
             if eMissileFire[i] == "fire":
+
                 eFireMisslie(eMX[i],eMY[i], i)
                 
                 eMY[i] += eMissileChange
-
-
-        # for i in range(numEnemies):
-            # if i not in hitList:
+                # print(y)
+                if eMY[i] > y and eMY[i] < y + 50:
+                    # print(eMY[i])
+                    if eMX[i] < x + 50 and eMX[i] > x:
+                        print("hit") 
+                # if hitDetect(x,y, eMY[i], eMY[i], 50, 50, 0) is True:
+                #     print("hit")
 
         x += x_change
         player(x,y)
