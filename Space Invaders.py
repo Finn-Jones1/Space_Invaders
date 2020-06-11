@@ -111,10 +111,7 @@ def gameLoop():
                     if missileFire == "ready":
                         missileX = x + 28
                         missileY = y
-                        for i in range(numEnemies):
-                            eMX[i] = Ex[i]
-                            eMY[i] = Ey[i]
-                            eMissileFire[i] = "fire"
+
                     
 
                     missileFire = "fire"
@@ -152,9 +149,10 @@ def gameLoop():
             axis = joystick.get_axis(0)
 
         # if joyConnect == "true":
+
         if axis > 0.5:
             x = x + playerSpeed * axis
-        elif axis < 0:
+        elif axis < -0.01:
             x = x + playerSpeed * axis
 
 
@@ -193,6 +191,16 @@ def gameLoop():
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
 
+                hello = random.randint(0,1)
+                # print(hello)
+
+                if hello == 1:
+                    if eMissileFire[i] != "fire":
+                        eMX[i] = Ex[i]
+                        eMY[i] = Ey[i]
+                        eMissileFire[i] = "fire"
+                if eMY[i] > 700:
+                    eMissileFire[i] = "fire"
             if Ex[i] > display_width - 10:
                 Ey[i] = Ey[i] + 100
                 eChangeX[i] = -enemySpeed
@@ -206,6 +214,9 @@ def gameLoop():
                 
                 eMY[i] += eMissileChange
 
+
+        # for i in range(numEnemies):
+            # if i not in hitList:
 
         x += x_change
         player(x,y)
