@@ -34,7 +34,7 @@ eMChangeY = []
 eMissileFire = []
 eMX = []
 eMY = []
-numEnemies = 15
+numEnemies = 1
 
 for i in range(numEnemies):
 
@@ -101,8 +101,21 @@ def gameLoop():
     missileY_change = -30
     missileFire = "ready"
     points = 0
-
+    connectEndLoop = "false"
     joyConnect = "false"
+
+    # while connectEndLoop == "false":
+    #     connection = input("Connected Controler?(Y/N): ")
+    #     if connection == "Y":
+    #         joyConnect = "true"
+    #         connectEndLoop = "true"
+
+    #     elif connection == "N":
+    #         joyConnect = "false"
+    #         connectEndLoop = "true"
+
+    #     else:
+    #         print("Please connect a controler")
 
     stop = False
     while not stop:
@@ -150,12 +163,12 @@ def gameLoop():
             joystick.init()
             axis = joystick.get_axis(0)
 
-        # if joyConnect == "true":
+        if joyConnect == "true":
 
-        if axis > 0.5:
-            x = x + playerSpeed * axis
-        elif axis < -0.01:
-            x = x + playerSpeed * axis
+            if axis > 0.5:
+                x = x + playerSpeed * axis
+            elif axis < -0.01:
+                x = x + playerSpeed * axis
 
 
 
@@ -198,7 +211,7 @@ def gameLoop():
                         eMX[i] = Ex[i]
                         eMY[i] = Ey[i]
                         eMissileFire[i] = "fire"
-                if eMY[i] > 700:
+                if eMY[i] > 670:
                     eMissileFire[i] = "ready"
 
             if Ex[i] > display_width - 10:
@@ -217,13 +230,10 @@ def gameLoop():
                 # print(y)
                 if eMY[i] > y and eMY[i] < y + 50:
                     # print(eMY[i])
-                    if eMX[i] < x + 50 and eMX[i] > x:
+                    if eMX[i] < x + 100 and eMX[i] > x:
                         points += 1
-                        if points == 5:
-                            stop = True
-
-
-
+                        # if points == 5:
+                        #     stop = True
                         print("hit")
 
                 # if hitDetect(x,y, eMY[i], eMY[i], 50, 50, 0) is True:
