@@ -78,11 +78,10 @@ def textRender(text, font):
     textSurface = font.render(text, True, white)
     return textSurface, textSurface.get_rect()
 
-def showText(text, fontSize):
+def showText(text, fontSize, textloc):
     Font = pygame.font.Font(FlexyPath+'/Quicksand-VariableFont_wght.ttf', fontSize)
     finalText, textLoc = textRender(text, Font)
-    textLoc = (10,0)
-    gameDisplay.blit(finalText, textLoc)
+    gameDisplay.blit(finalText, textloc)
 
 def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
     if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
@@ -101,6 +100,7 @@ def gameLoop():
     EnemyL = 78
     missileY_change = -30
     missileFire = "ready"
+    points = 0
 
     joyConnect = "false"
 
@@ -141,7 +141,7 @@ def gameLoop():
             
         gameDisplay.fill(black)
 
-        showText('Score: ' + str(len(hitList)), 50)
+        showText('Score: ' + str(len(hitList)), 50, (10,0))
 
         joystick_count = pygame.joystick.get_count()
 
@@ -152,10 +152,10 @@ def gameLoop():
 
         # if joyConnect == "true":
 
-        # if axis > 0.5:
-        #     x = x + playerSpeed * axis
-        # elif axis < -0.01:
-        #     x = x + playerSpeed * axis
+        if axis > 0.5:
+            x = x + playerSpeed * axis
+        elif axis < -0.01:
+            x = x + playerSpeed * axis
 
 
 
@@ -218,10 +218,19 @@ def gameLoop():
                 if eMY[i] > y and eMY[i] < y + 50:
                     # print(eMY[i])
                     if eMX[i] < x + 50 and eMX[i] > x:
-                        print("hit") 
+                        points += 1
+                        if points == 5:
+                            stop = True
+
+
+
+                        print("hit")
+
                 # if hitDetect(x,y, eMY[i], eMY[i], 50, 50, 0) is True:
                 #     print("hit")
 
+
+        showText('hello: ' + str(points), 50, (700,0))
         x += x_change
         player(x,y)
 
