@@ -1,4 +1,4 @@
-import pygame, sys, os, random
+import pygame, sys, os, random, time, datetime
 from pygame.locals import *
 
 clock = pygame.time.Clock()
@@ -11,15 +11,16 @@ display_height = 700
 
 pygame.joystick.init()
 
-gameDisplay = pygame.display.set_mode((display_width,display_height))
+screen = pygame.display.set_mode((display_width,display_height))
 
 pygame.display.set_caption('Space Invaders')
 
 black = (0,0,0)
 white = (255,255,255)
+grey = (128,128,128)
 enemySpeed = 5
 enemySpacing = 50
-eMissileChange = 30
+eMissileChange = 15
 enemyImg = []
 Ex = []
 Ey = []
@@ -50,20 +51,32 @@ for i in range(numEnemies):
     
 
 
-# walkCount = 0
+# Sound Effects
+hitSound = pygame.mixer.Sound(FlexyPath+"/Hit_Hurt.wav")
+click = pygame.mixer.Sound(FlexyPath+"/Blip_Select.wav")
+Shoot = pygame.mixer.Sound(FlexyPath+"/Missile_Shoot.wav")
+Explosion = pygame.mixer.Sound(FlexyPath+"/Explosion.wav")
+hitSound = pygame.mixer.Sound(FlexyPath+"/Hit_Hurt.wav")
 
+# Background
+background_image = pygame.image.load(FlexyPath+"/bg.png")
+
+# countdown()
+
+def boom(x,y):
+    screen.blit(pygame.image.load(FlexyPath+"/Boom.png"),(x,y))
 
 def player(x,y):
-    gameDisplay.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
+    screen.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
 
 def enemy(x,y,i):
-    gameDisplay.blit((enemyImg[i]), (x,y))
+    screen.blit((enemyImg[i]), (x,y))
 
 def fireMisslie(x,y):
-    gameDisplay.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
+    screen.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
 
 def eFireMisslie(x,y,i):
-    gameDisplay.blit((eMissile[i]), (x,y))
+    screen.blit((eMissile[i]), (x,y))
 
 
 # def textDisplay(text):
@@ -77,7 +90,7 @@ def textRender(text, font , colour):
 def showText(text, fontSize, textloc, colour):
     Font = pygame.font.Font(FlexyPath+'/Quicksand-VariableFont_wght.ttf', fontSize)
     finalText, textLoc = textRender(text, Font , colour)
-    gameDisplay.blit(finalText, textloc)
+    screen.blit(finalText, textloc)
 
 def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
     if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
@@ -86,48 +99,69 @@ def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
 # def Buttons(x,x1,y,y1, buttonName):
 
 
-#             pygame.display.update()
-#             clock.tick(120)
+#             
 def Into():
+    global joyConnect
+    joyConnect = "false"
+    controlerStatus = "Off"
     stop = False
     
+    screen.blit(background_image, [0, 0])
+    pygame.draw.rect(screen,white,(404,500,100,50))
+    pygame.draw.rect(screen,white,(380,600,150,50))
 
-    pygame.draw.rect(gameDisplay,white,(404,500,100,50))
 
-    # showText('buttonName', 30, (410 ,505), black)
-    # showText('Pew Pew 2D', 50, (100 ,100), white)
+
+    showText('Start', 30, (420 ,505), black)
+    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+
+    showText('Pew Pew 2D', 50, (100 ,100), white)
+
     while not stop:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+            if joyConnect == "true":
+                controlerStatus = "On"
+            elif joyConnect == "false":
+                controlerStatus = "Off"
+
+            
             if pygame.mouse.get_pos()[0] > 405 and pygame.mouse.get_pos()[0] < 505:
-                # print("test")
                 if pygame.mouse.get_pos()[1] > 500 and pygame.mouse.get_pos()[1] < 550:
                     if event.type == pygame.MOUSEBUTTONDOWN:
+                        click.play()
+                        pygame.draw.rect(screen,grey,(404,500,100,50))
+                        showText('Start', 30, (420 ,505), black)
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        pygame.draw.rect(screen,white,(404,500,100,50))
+                        showText('Start', 30, (420 ,505), black)
                         print("pressed")
                         stop = True
 
-    pygame.display.update()
-    clock.tick(120)
-    
-    # Buttons(405, 505, 500, 550, "Start")
+            if pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
+                if pygame.mouse.get_pos()[1] > 600 and pygame.mouse.get_pos()[1] < 649:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        click.play()
+                        print("test")
+                        if joyConnect == "true":
+                            joyConnect = "false"
+                            pygame.draw.rect(screen,grey,(380,600,150,50))
 
-    # Buttons(305, 405, 500, 550, "Start")
+                        elif joyConnect == "false":
+                            joyConnect = "true"
+                            pygame.draw.rect(screen,grey,(380,600,150,50))
+                        showText('Controler '+ controlerStatus, 20, (396 ,610), black)
 
-    
+                            
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        pygame.draw.rect(screen,white,(380,600,150,50))
+                        showText('Controler '+ controlerStatus, 20, (396 ,610), black)
 
-    # while not stop:
-
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             quit()
-
-
+            pygame.display.update()
+            clock.tick(120)
 
 
-    #         pygame.display.update()
-    #         clock.tick(120)
 
 
 def gameLoop():
@@ -144,20 +178,10 @@ def gameLoop():
     missileFire = "ready"
     health = 5
     connectEndLoop = "false"
-    joyConnect = "false"
 
-    # while connectEndLoop == "false":
-    #     connection = input("Connected Controler?(Y/N): ")
-    #     if connection == "Y":
-    #         joyConnect = "true"
-    #         connectEndLoop = "true"
 
-    #     elif connection == "N":
-    #         joyConnect = "false"
-    #         connectEndLoop = "true"
 
-    #     else:
-    #         print("Please connect a controler")
+
 
     stop = False
     while not stop:
@@ -165,7 +189,9 @@ def gameLoop():
             if event.type == pygame.QUIT:
                 stop = True
             if event.type == pygame.JOYBUTTONDOWN:
+                
                     if missileFire == "ready":
+                        Shoot.play()
                         missileX = x + 28
                         missileY = y
 
@@ -184,6 +210,7 @@ def gameLoop():
                     stop = True
                 elif event.key == pygame.K_SPACE:
                     if missileFire == "ready":
+                        Shoot.play()
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
@@ -193,7 +220,7 @@ def gameLoop():
                 elif event.key == pygame.K_d:
                     x_change -= playerSpeed
             
-        gameDisplay.fill(black)
+        screen.blit(background_image, [0, 0])
 
         showText('Score: ' + str(len(hitList)), 50, (10,0), white)
 
@@ -211,7 +238,7 @@ def gameLoop():
             elif axis < -0.01:
                 x = x + playerSpeed * axis
 
-        if missileY <=0:
+        if missileY < -20:
             missileFire = "ready"
 
         if missileFire == "fire":
@@ -221,7 +248,10 @@ def gameLoop():
                 print("y crossover")
                 if hitDetect(Ex[i],Ey[i], missileX, missileY, 15, 30, 20) is True:
                     if i not in hitList:
+                        Explosion.play()
+                        boom(Ex[i], Ey[i])
                         hitList.append(i)
+
                         # Shot = True
                         missileFire = "ready"
                         print("x crossover")
@@ -235,7 +265,7 @@ def gameLoop():
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
 
-                shootDelay = random.randint(0,100)
+                shootDelay = random.randint(0,300)
 
                 if shootDelay == 1:
                     if eMissileFire[i] != "fire":
@@ -259,19 +289,23 @@ def gameLoop():
                 
                 eMY[i] += eMissileChange
                 # print(y)
-                if eMY[i] > y and eMY[i] < y + 50:
+                if eMY[i] + 50 > y and eMY[i] < y + 50:
                     # print(eMY[i])
-                    if eMX[i] < x + 100 and eMX[i] > x:
+                    if eMX[i] < x + 90 and eMX[i] > x:
                         health -= 1
+                        hitSound.play()
+                        eMissileFire[i] = "ready"
+                        boom(eMX[i],eMY[i])
                         print("hit")
-
 
         showText('Lives: ' + str(health), 50, (700,0), white)
         x += x_change
         player(x,y)
+        print(y)
+        print(pygame.mouse.get_pos())
 
         pygame.display.update()
-        clock.tick(120)
+        clock.tick(100)
 Into()
 gameLoop()
 pygame.quit()
