@@ -18,9 +18,9 @@ pygame.display.set_caption('Space Invaders')
 black = (0,0,0)
 white = (255,255,255)
 grey = (128,128,128)
-enemySpeed = 5
+lightGrey = (211,211,211)
+
 enemySpacing = 50
-eMissileChange = 15
 enemyImg = []
 Ex = []
 Ey = []
@@ -34,7 +34,13 @@ eMChangeY = []
 eMissileFire = []
 eMX = []
 eMY = []
-numEnemies = 15
+
+
+numEnemies = 3
+levelCounter = 1
+eMissileChange = 15
+enemySpeed = 5
+
 
 for i in range(numEnemies):
     enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
@@ -100,7 +106,7 @@ def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
 
 
 #             
-def Into():
+def Intro():
     global joyConnect
     joyConnect = "false"
     controlerStatus = "Off"
@@ -129,6 +135,8 @@ def Into():
             
             if pygame.mouse.get_pos()[0] > 405 and pygame.mouse.get_pos()[0] < 505:
                 if pygame.mouse.get_pos()[1] > 500 and pygame.mouse.get_pos()[1] < 550:
+                    pygame.draw.rect(screen,lightGrey,(404,500,100,50))
+                    showText('Start', 30, (420 ,505), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         click.play()
                         pygame.draw.rect(screen,grey,(404,500,100,50))
@@ -138,9 +146,15 @@ def Into():
                         showText('Start', 30, (420 ,505), black)
                         print("pressed")
                         stop = True
+                else:
+                    pygame.draw.rect(screen,white,(404,500,100,50))
+                    showText('Start', 30, (420 ,505), black)
+
 
             if pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
                 if pygame.mouse.get_pos()[1] > 600 and pygame.mouse.get_pos()[1] < 649:
+                    pygame.draw.rect(screen,lightGrey,(380,600,150,50))
+                    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         click.play()
                         print("test")
@@ -157,6 +171,9 @@ def Into():
                     if event.type == pygame.MOUSEBUTTONUP:
                         pygame.draw.rect(screen,white,(380,600,150,50))
                         showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+                else:
+                    pygame.draw.rect(screen,white,(380,600,150,50))
+                    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
 
             pygame.display.update()
             clock.tick(120)
@@ -165,6 +182,12 @@ def Into():
 
 
 def gameLoop():
+    global levelCounter
+    global enemySpeed
+    global numEnemies
+
+
+
     hitList = []
     x = (display_width * 0.45)
     y = (display_height * 0.8)
@@ -298,15 +321,39 @@ def gameLoop():
                         boom(eMX[i],eMY[i])
                         print("hit")
 
+        if len(hitList) == numEnemies:
+            levelCounter += 1
+            enemySpeed = enemySpeed + levelCounter
+            print(numEnemies)
+            hitList.clear()
+            eChangeX.clear()
+            Ex.clear()
+            Ey.clear()
+            eMissileFire.clear()
+            numEnemies = numEnemies + 2
+            x_change = 0
+            for i in range(numEnemies):
+                enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
+                eChangeX.append(enemySpeed)
+                Ex.append(100 + enemySpacing * i)
+                Ey.append(100)
+                eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+                eMissileFire.append("ready")
+                eMX.append(100)
+                eMY.append(100)
+
+
+            Intro()
+        # if health == 0:
+        #     gameOverScreen()
+        showText('Level ' + str(levelCounter), 50, (500,0), white)
         showText('Lives: ' + str(health), 50, (700,0), white)
         x += x_change
         player(x,y)
-        print(y)
-        print(pygame.mouse.get_pos())
 
         pygame.display.update()
         clock.tick(100)
-Into()
+Intro()
 gameLoop()
 pygame.quit()
 quit()
