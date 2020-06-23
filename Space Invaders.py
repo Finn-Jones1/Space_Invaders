@@ -105,6 +105,7 @@ def Intro():
     stop = False
     
     screen.blit(background_image, [0, 0])
+    pygame.draw.rect(screen,white,(404,400,100,50))
     pygame.draw.rect(screen,white,(404,500,100,50))
     pygame.draw.rect(screen,white,(380,600,150,50))
 
@@ -146,7 +147,7 @@ def Intro():
                     showText('Start', 30, (420 ,505), black)
 
 
-            if pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
+            elif pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
                 if pygame.mouse.get_pos()[1] > 600 and pygame.mouse.get_pos()[1] < 649:
                     pygame.draw.rect(screen,lightGrey,(380,600,150,50))
                     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
@@ -169,6 +170,13 @@ def Intro():
                 else:
                     pygame.draw.rect(screen,white,(380,600,150,50))
                     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
+
+
+            elif pygame.mouse.get_pos()[0] > 405 and pygame.mouse.get_pos()[0] < 505:
+                if pygame.mouse.get_pos()[1] > 400 and pygame.mouse.get_pos()[1] < 450:
+                    pygame.draw.rect(screen,lightGrey,(380,600,150,50))
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        print("test")
 
             pygame.display.update()
             clock.tick(120)
