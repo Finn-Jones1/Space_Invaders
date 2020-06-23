@@ -74,7 +74,8 @@ def boom(x,y):
 
 def player(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
-
+def bossEn(x,y):
+    screen.blit(pygame.image.load(FlexyPath+"/BossE.png"), (x,y))
 def enemy(x,y,i):
     screen.blit((enemyImg[i]), (x,y))
 
@@ -83,11 +84,6 @@ def fireMisslie(x,y):
 
 def eFireMisslie(x,y,i):
     screen.blit((eMissile[i]), (x,y))
-
-
-# def textDisplay(text):
-#     text = pygame.font.Font(FlexyPath + 'Quicksand-VariableFont_wght.ttf', 110)
-
 
 def textRender(text, font , colour):
     textSurface = font.render(text, True, colour)
@@ -101,15 +97,11 @@ def showText(text, fontSize, textloc, colour):
 def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
     if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
         return True
-
-# def Buttons(x,x1,y,y1, buttonName):
-
-
-#             
+  
 def Intro():
     global joyConnect
     joyConnect = "false"
-    controlerStatus = "Off"
+    controllerStatus = "Off"
     stop = False
     
     screen.blit(background_image, [0, 0])
@@ -119,7 +111,7 @@ def Intro():
 
 
     showText('Start', 30, (420 ,505), black)
-    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+    showText('Controller '+ controllerStatus, 20, (396 ,610), black)
 
     showText('Pew Pew 2D', 50, (100 ,100), white)
 
@@ -127,10 +119,13 @@ def Intro():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+
+
             if joyConnect == "true":
-                controlerStatus = "On"
+                controllerStatus = "On"
             elif joyConnect == "false":
-                controlerStatus = "Off"
+                controllerStatus = "Off"
+
 
             
             if pygame.mouse.get_pos()[0] > 405 and pygame.mouse.get_pos()[0] < 505:
@@ -154,7 +149,7 @@ def Intro():
             if pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
                 if pygame.mouse.get_pos()[1] > 600 and pygame.mouse.get_pos()[1] < 649:
                     pygame.draw.rect(screen,lightGrey,(380,600,150,50))
-                    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+                    showText('Controller '+ controllerStatus, 20, (396 ,610), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         click.play()
                         print("test")
@@ -165,29 +160,29 @@ def Intro():
                         elif joyConnect == "false":
                             joyConnect = "true"
                             pygame.draw.rect(screen,grey,(380,600,150,50))
-                        showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+                        showText('Controller '+ controllerStatus, 20, (396 ,610), black)
 
                             
                     if event.type == pygame.MOUSEBUTTONUP:
                         pygame.draw.rect(screen,white,(380,600,150,50))
-                        showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+                        showText('Controller '+ controllerStatus, 20, (396 ,610), black)
                 else:
                     pygame.draw.rect(screen,white,(380,600,150,50))
-                    showText('Controler '+ controlerStatus, 20, (396 ,610), black)
+                    showText('Controller '+ controllerStatus, 20, (396 ,610), black)
 
             pygame.display.update()
             clock.tick(120)
-
-
-
 
 def gameLoop():
     global levelCounter
     global enemySpeed
     global numEnemies
 
+    Score = 0
+    BossX = 2000
+    BossY = 100
 
-
+    bossChange = -10
     hitList = []
     x = (display_width * 0.45)
     y = (display_height * 0.8)
@@ -197,6 +192,8 @@ def gameLoop():
     playerSpeed = 20
     EnemyW = 28
     EnemyL = 78
+    missileX = 0
+    missileY = 0
     missileY_change = -30
     missileFire = "ready"
     health = 5
@@ -210,7 +207,7 @@ def gameLoop():
     while not stop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                stop = True
+                Intro()
             if event.type == pygame.JOYBUTTONDOWN:
                 
                     if missileFire == "ready":
@@ -244,8 +241,13 @@ def gameLoop():
                     x_change -= playerSpeed
             
         screen.blit(background_image, [0, 0])
+        # print(str(Score),"this is a great test")
+        # print(str(len(hitList)),"list")
+        
+        # print(str(len(hitList)),"hit")
 
-        showText('Score: ' + str(len(hitList)), 50, (10,0), white)
+        # print(str(Score),"hello")
+        
 
         joystick_count = pygame.joystick.get_count()
 
@@ -274,7 +276,7 @@ def gameLoop():
                         Explosion.play()
                         boom(Ex[i], Ey[i])
                         hitList.append(i)
-
+                        Score = Score + len(hitList) * 10
                         # Shot = True
                         missileFire = "ready"
                         print("x crossover")
@@ -306,6 +308,7 @@ def gameLoop():
                 Ey[i] = Ey[i] + 100
                 eChangeX[i] = enemySpeed
             
+            
             if eMissileFire[i] == "fire":
 
                 eFireMisslie(eMX[i],eMY[i], i)
@@ -320,6 +323,10 @@ def gameLoop():
                         eMissileFire[i] = "ready"
                         boom(eMX[i],eMY[i])
                         print("hit")
+
+            if Ey[i] > 650:
+                if Ex[i] < 0:
+                    gameOverScreen()
 
         if len(hitList) == numEnemies:
             levelCounter += 1
@@ -342,18 +349,65 @@ def gameLoop():
                 eMX.append(100)
                 eMY.append(100)
 
+            gameLoop()
 
-            Intro()
-        # if health == 0:
-        #     gameOverScreen()
+        if health == 0:
+            levelCounter = 1
+            enemySpeed = 5
+            numEnemies = 3
+            gameOverScreen()
+
+        if BossX < -100:
+            BossX = 5000
+
+        
+            
         showText('Level ' + str(levelCounter), 50, (500,0), white)
         showText('Lives: ' + str(health), 50, (700,0), white)
         x += x_change
+        BossX += bossChange
         player(x,y)
+
+        if hitDetect(BossX,BossY, missileX, missileY, 15, 30, 20) is not True:
+            bossEn(BossX, BossY)
+        else:
+            Explosion.play()
+            boom(BossX, BossY)
+            Score = Score + 100
+            print(Score)
+            BossX = 2000
+            missileFire = "ready"
+
+        showText('Score: ' + str(Score), 50, (10,0), white)
 
         pygame.display.update()
         clock.tick(100)
+
+def gameOverScreen():
+    stop = False
+    
+    screen.blit(background_image, [0, 0])
+    # pygame.draw.rect(screen,white,(404,500,100,50))
+    # pygame.draw.rect(screen,white,(380,600,150,50))
+
+
+    showText('Game Over', 50, (100 ,100), white)
+    showText('Click To Play Again', 30, (100 ,150), white)
+
+    
+
+    while not stop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Intro()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                Intro()
+
+        pygame.display.update()
+        clock.tick(120)
+
 Intro()
 gameLoop()
+# gameOverScreen()
 pygame.quit()
 quit()
