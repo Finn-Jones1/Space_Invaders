@@ -20,6 +20,17 @@ white = (255,255,255)
 grey = (128,128,128)
 lightGrey = (211,211,211)
 
+f=open(FlexyPath + "/data.txt", "r")
+contents = f.read()
+f.close()
+Scontents = contents.split()
+
+highestLevel = Scontents[0]
+
+highestScore = Scontents[1]
+
+
+
 enemySpacing = 50
 enemyImg = []
 Ex = []
@@ -34,7 +45,11 @@ eMChangeY = []
 eMissileFire = []
 eMX = []
 eMY = []
-
+x_change = 0
+Score = 0
+playerSpeed = 15
+doublePoints = False
+clusterShot = False
 
 numEnemies = 3
 levelCounter = 1
@@ -69,13 +84,28 @@ background_image = pygame.image.load(FlexyPath+"/bg.png")
 
 # countdown()
 
+def save():
+    # global Score
+    # global levelCounter
+    global highestScore
+    global highestLevel
+    f = open(FlexyPath + '/data.txt','w')
+    if int(Score) > int(highestScore):
+        highestScore = Score
+    if int(levelCounter) > int(highestLevel):
+        highestLevel = levelCounter
+
+    f.write(str(highestLevel)+ " " + str(highestScore))
+
 def boom(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/Boom.png"),(x,y))
 
 def player(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
+
 def bossEn(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/BossE.png"), (x,y))
+
 def enemy(x,y,i):
     screen.blit((enemyImg[i]), (x,y))
 
@@ -97,24 +127,35 @@ def showText(text, fontSize, textloc, colour):
 def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
     if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
         return True
+    else:
+        return False
   
 def Intro():
     global joyConnect
+    global powerupSelector
+    global selection
     joyConnect = "false"
     controllerStatus = "Off"
+    powerupSelector = ["Double Points", "Cluster Shot", "Super Speed"]
+    selection = 0
     stop = False
     
     screen.blit(background_image, [0, 0])
-    pygame.draw.rect(screen,white,(404,400,100,50))
+    
+    # Start Game
     pygame.draw.rect(screen,white,(404,500,100,50))
+    # Powerup Switcher Button
+    pygame.draw.rect(screen,white,(370,400,170,50))
+    # Controler On / Off
     pygame.draw.rect(screen,white,(380,600,150,50))
-
-
 
     showText('Start', 30, (420 ,505), black)
     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
-
     showText('Pew Pew 2D', 50, (100 ,100), white)
+    showText('High Score: '+ str(highestScore), 30, (100 ,170), white)
+    showText('High Level: '+ str(highestLevel), 30, (100 ,210), white)
+    showText('Powerup Selecter: ', 20, (375 ,405), black)
+    showText(powerupSelector[selection], 15, (402 ,430), black)
 
     while not stop:
         for event in pygame.event.get():
@@ -141,13 +182,13 @@ def Intro():
                         pygame.draw.rect(screen,white,(404,500,100,50))
                         showText('Start', 30, (420 ,505), black)
                         print("pressed")
-                        stop = True
+                        gameLoop()
                 else:
                     pygame.draw.rect(screen,white,(404,500,100,50))
                     showText('Start', 30, (420 ,505), black)
 
 
-            elif pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
+            if pygame.mouse.get_pos()[0] > 380 and pygame.mouse.get_pos()[0] < 529:
                 if pygame.mouse.get_pos()[1] > 600 and pygame.mouse.get_pos()[1] < 649:
                     pygame.draw.rect(screen,lightGrey,(380,600,150,50))
                     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
@@ -172,11 +213,27 @@ def Intro():
                     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
 
 
-            elif pygame.mouse.get_pos()[0] > 405 and pygame.mouse.get_pos()[0] < 505:
+            if pygame.mouse.get_pos()[0] > 370 and pygame.mouse.get_pos()[0] < 540:
                 if pygame.mouse.get_pos()[1] > 400 and pygame.mouse.get_pos()[1] < 450:
-                    pygame.draw.rect(screen,lightGrey,(380,600,150,50))
+                    pygame.draw.rect(screen,lightGrey,(370,400,170,50))
+                    showText('Powerup Selecter: ', 20, (375 ,405), black)
+                    showText(powerupSelector[selection], 15, (402 ,430), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        print("test")
+                        selection = selection + 1
+                        print(selection)
+                        if len(powerupSelector) == selection:
+                            selection = 0
+                        pygame.draw.rect(screen,grey,(370,400,170,50))
+                        showText('Powerup Selecter: ', 20, (375 ,405), black)
+                        showText(powerupSelector[selection], 15, (402 ,430), black)
+                        
+                        print("change")
+            
+                else:
+                    pygame.draw.rect(screen,white,(370,400,170,50))
+                    showText('Powerup Selecter: ', 20, (375 ,405), black)
+                    showText(powerupSelector[selection], 15, (402 ,430), black)
+
 
             pygame.display.update()
             clock.tick(120)
@@ -185,19 +242,20 @@ def gameLoop():
     global levelCounter
     global enemySpeed
     global numEnemies
-
-    Score = 0
+    global x_change
+    global Score
+    global playerSpeed
+    global doublePoints
+    global clusterShot
     BossX = 2000
     BossY = 100
-
+    movementEprevent = 0
     bossChange = -10
     hitList = []
     x = (display_width * 0.45)
     y = (display_height * 0.8)
-    x_change = 0
     axis = ''
     missileY = 0
-    playerSpeed = 20
     EnemyW = 28
     EnemyL = 78
     missileX = 0
@@ -207,14 +265,30 @@ def gameLoop():
     health = 5
     connectEndLoop = "false"
 
+    
+
+    if powerupSelector[selection] == "Super Speed":
+        playerSpeed = 30
+        clusterShot = False
+        doublePoints = False
+
+    elif powerupSelector[selection] == "Double Points":
+        doublePoints = True
+        playerSpeed = 15
+        clusterShot = False
+    
+    elif powerupSelector[selection] == "Cluster Shot":
+        clusterShot = True
+        playerSpeed = 15
+        doublePoints = False
 
 
-
-
+    x_change = 0
     stop = False
     while not stop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save()
                 Intro()
             if event.type == pygame.JOYBUTTONDOWN:
                 
@@ -222,17 +296,15 @@ def gameLoop():
                         Shoot.play()
                         missileX = x + 28
                         missileY = y
-
-                    
-
                     missileFire = "fire"
-                    
-
+    
 
             if event.type == pygame.KEYDOWN:
+                movementEprevent = 1
                 if event.key == pygame.K_a:
                     x_change -= playerSpeed
                 elif event.key == pygame.K_d:
+                    
                     x_change += playerSpeed
                 elif event.key == pygame.K_ESCAPE:
                     stop = True
@@ -242,20 +314,19 @@ def gameLoop():
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_a:
-                    x_change += playerSpeed
-                elif event.key == pygame.K_d:
-                    x_change -= playerSpeed
-            
-        screen.blit(background_image, [0, 0])
-        # print(str(Score),"this is a great test")
-        # print(str(len(hitList)),"list")
-        
-        # print(str(len(hitList)),"hit")
 
-        # print(str(Score),"hello")
-        
+            if event.type == pygame.KEYUP:
+                if movementEprevent == 1:
+                    if event.key == pygame.K_a:
+                        x_change += playerSpeed
+                        
+                    elif event.key == pygame.K_d:
+                        x_change -= playerSpeed
+                    movementEprevent = 0
+                else:
+                    x_change = 0
+
+        screen.blit(background_image, [0, 0])
 
         joystick_count = pygame.joystick.get_count()
 
@@ -275,6 +346,16 @@ def gameLoop():
             missileFire = "ready"
 
         if missileFire == "fire":
+            if hitDetect(BossX,BossY, missileX, missileY, 15, 30, 20) is True:
+                Explosion.play()
+                boom(BossX, BossY)
+                if doublePoints is True:
+                    Score = Score + 200
+                else:
+                    Score = Score + 100
+                print(Score)
+                BossX = 2000
+                missileFire = "ready"
             fireMisslie(missileX,missileY)
             missileY += missileY_change
             for i in range(numEnemies):
@@ -284,7 +365,18 @@ def gameLoop():
                         Explosion.play()
                         boom(Ex[i], Ey[i])
                         hitList.append(i)
-                        Score = Score + len(hitList) * 10
+                        if clusterShot is True:
+                            if i - 1 >= 0 and i - 1 not in hitList:
+                                boom(Ex[i - 1], Ey[i - 1])
+                                hitList.append(i - 1)
+                            if i + 1 < numEnemies and i + 1 not in hitList:
+                                boom(Ex[i + 1], Ey[i + 1])
+                                hitList.append(i + 1)
+                            
+                        if doublePoints is True:
+                            Score = Score + 20
+                        else:
+                            Score = Score + 10
                         # Shot = True
                         missileFire = "ready"
                         print("x crossover")
@@ -294,6 +386,7 @@ def gameLoop():
 
         for i in range(numEnemies):
             if i not in hitList:
+                
                 
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
@@ -330,15 +423,42 @@ def gameLoop():
                         hitSound.play()
                         eMissileFire[i] = "ready"
                         boom(eMX[i],eMY[i])
+                        showText('Lives: ' + str(health), 50, (700,0), white)
                         print("hit")
 
-            if Ey[i] > 650:
-                if Ex[i] < 0:
-                    gameOverScreen()
+
+            if health == 0 or Ey[i] > 650 and Ex[i] < 0:
+                save()
+                hitList.clear()
+                eChangeX.clear()
+                Ex.clear()
+                Ey.clear()
+                eMissileFire.clear()
+                levelCounter = 1
+                enemySpeed = 5
+                numEnemies = 3
+                Score = 0
+                enemyImg.clear()
+                eMissile.clear()
+                eMX.clear()
+                eMY.clear()
+                for i in range(numEnemies):
+                    enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
+                    eChangeX.append(enemySpeed)
+                    Ex.append(100 + enemySpacing * i)
+                    Ey.append(100)
+                    eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+                    eMissileFire.append("ready")
+                    eMX.append(100)
+                    eMY.append(100)
+
+                gameOverScreen()
+
 
         if len(hitList) == numEnemies:
             levelCounter += 1
-            enemySpeed = enemySpeed + levelCounter
+            save()
+            enemySpeed = enemySpeed + int(levelCounter)
             print(numEnemies)
             hitList.clear()
             eChangeX.clear()
@@ -359,45 +479,33 @@ def gameLoop():
 
             gameLoop()
 
-        if health == 0:
-            levelCounter = 1
-            enemySpeed = 5
-            numEnemies = 3
-            gameOverScreen()
+
 
         if BossX < -100:
-            BossX = 5000
+            BossX = 2000
 
         
-            
-        showText('Level ' + str(levelCounter), 50, (500,0), white)
-        showText('Lives: ' + str(health), 50, (700,0), white)
+
+        
+        showText('Level ' + str(levelCounter), 50, (700,0), white)
+        
         x += x_change
         BossX += bossChange
         player(x,y)
 
-        if hitDetect(BossX,BossY, missileX, missileY, 15, 30, 20) is not True:
-            bossEn(BossX, BossY)
-        else:
-            Explosion.play()
-            boom(BossX, BossY)
-            Score = Score + 100
-            print(Score)
-            BossX = 2000
-            missileFire = "ready"
-
+        
+        bossEn(BossX, BossY)
         showText('Score: ' + str(Score), 50, (10,0), white)
 
         pygame.display.update()
         clock.tick(100)
 
+
+
 def gameOverScreen():
     stop = False
     
     screen.blit(background_image, [0, 0])
-    # pygame.draw.rect(screen,white,(404,500,100,50))
-    # pygame.draw.rect(screen,white,(380,600,150,50))
-
 
     showText('Game Over', 50, (100 ,100), white)
     showText('Click To Play Again', 30, (100 ,150), white)
@@ -415,7 +523,7 @@ def gameOverScreen():
         clock.tick(120)
 
 Intro()
-gameLoop()
+
 # gameOverScreen()
 pygame.quit()
 quit()
