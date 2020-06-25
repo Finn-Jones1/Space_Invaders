@@ -82,7 +82,8 @@ hitSound = pygame.mixer.Sound(FlexyPath+"/Hit_Hurt.wav")
 # Background
 background_image = pygame.image.load(FlexyPath+"/bg.png")
 
-# countdown()
+pygame.mixer.music.load(FlexyPath+'/music.mp3')
+pygame.mixer.music.play(-1)
 
 def save():
     # global Score
@@ -298,45 +299,61 @@ def gameLoop():
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
-            if x < 10:
-                x = 11
-                boundaries = 1
-            else:
-                boundaries = 0
+
+
 
             if event.type == pygame.KEYDOWN:
-                movementEprevent = 0
+                
 
-                if boundaries == 0:
-                    
-                    if event.key == pygame.K_a:
-                        x_change -= playerSpeed
-                        # boundaries = 1
-                        movementEprevent = 1
-                        
-
-                if event.key == pygame.K_d:
-                    x_change += playerSpeed
-                    movementEprevent = 1
-                elif event.key == pygame.K_ESCAPE:
-                    stop = True
-                elif event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE:
                     if missileFire == "ready":
                         Shoot.play()
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
 
+                elif event.key == pygame.K_a:
+                    x_change -= playerSpeed
+                    movementEprevent = 1
+
+                elif event.key == pygame.K_d:
+                    x_change += playerSpeed
+                    movementEprevent = 1
+                    
+                # elif event.key == pygame.K_ESCAPE:
+                #     stop = True
+
+
             if event.type == pygame.KEYUP:
-                if movementEprevent == 1:
-                    if event.key == pygame.K_a:
+                
+                if event.key == pygame.K_a:
+                    if movementEprevent == 1:
                         x_change += playerSpeed
-                        
-                    elif event.key == pygame.K_d:
+                    else:
+                        x_change = 0
+                    
+                elif event.key == pygame.K_d:
+                    if movementEprevent == 1:
                         x_change -= playerSpeed
+                    else:
+                        x_change = 0
                     movementEprevent = 0
-                else:
-                    x_change = 0
+            # else:
+            #     print("ting")
+            #     x_change = 0
+
+
+        if x < 10:
+            if x_change < 0:
+                x_change = 0
+                movementEprevent = 0
+
+        elif x > 821:
+            if x_change > 0:
+                x_change = 0
+                movementEprevent = 0
+
+
 
         screen.blit(background_image, [0, 0])
 
