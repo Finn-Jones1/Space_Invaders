@@ -264,6 +264,7 @@ def gameLoop():
     missileFire = "ready"
     health = 5
     connectEndLoop = "false"
+    boundaries = 0
 
     
 
@@ -297,15 +298,26 @@ def gameLoop():
                         missileX = x + 28
                         missileY = y
                     missileFire = "fire"
-    
+            if x < 10:
+                x = 11
+                boundaries = 1
+            else:
+                boundaries = 0
 
             if event.type == pygame.KEYDOWN:
-                movementEprevent = 1
-                if event.key == pygame.K_a:
-                    x_change -= playerSpeed
-                elif event.key == pygame.K_d:
+                movementEprevent = 0
+
+                if boundaries == 0:
                     
+                    if event.key == pygame.K_a:
+                        x_change -= playerSpeed
+                        # boundaries = 1
+                        movementEprevent = 1
+                        
+
+                if event.key == pygame.K_d:
                     x_change += playerSpeed
+                    movementEprevent = 1
                 elif event.key == pygame.K_ESCAPE:
                     stop = True
                 elif event.key == pygame.K_SPACE:
@@ -423,7 +435,7 @@ def gameLoop():
                         hitSound.play()
                         eMissileFire[i] = "ready"
                         boom(eMX[i],eMY[i])
-                        showText('Lives: ' + str(health), 50, (700,0), white)
+                        
                         print("hit")
 
 
@@ -487,7 +499,7 @@ def gameLoop():
         
 
         
-        showText('Level ' + str(levelCounter), 50, (700,0), white)
+        showText('Level: ' + str(levelCounter), 50, (500,0), white)
         
         x += x_change
         BossX += bossChange
@@ -495,6 +507,7 @@ def gameLoop():
 
         
         bossEn(BossX, BossY)
+        showText('Lives: ' + str(health), 50, (700,0), white)
         showText('Score: ' + str(Score), 50, (10,0), white)
 
         pygame.display.update()
