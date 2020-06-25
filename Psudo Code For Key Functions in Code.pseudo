@@ -1,0 +1,47 @@
+BEGIN Collisions
+
+enemyWidth = 10
+enemyHeight = 10
+enemyX = 100
+enemyY = 100
+missileX = 500
+missileY = 500
+
+if enemyX - enemyWidth < missileX and enemyX + enemyWidth > missileX and enemyY + enemyHeight > missileY and enemyY - hitSize < y1:
+    PRINT "Collision"
+else:
+    PRINT "No Collision"
+
+
+-------------------------------------------------------------------------------
+
+BEGIN Movement
+
+playerX = 10
+playerY = 10
+playerMoveSpeed = 5
+while (True) {
+    if A is pressed:
+        playerX -= playerMoveSpeed
+
+    if D is pressed:
+        playerX += playerMoveSpeed
+}
+
+------------------------------------------------------------------------------
+
+BEGIN Save
+
+score = 10
+level = 15
+highScore = 100
+highLevel = 5
+
+textFileVar = OPEN("data.txt")
+if score > highScore:
+    highScore = score
+if level > highLevel:
+    highLevel = level
+
+WRITE (highScore,highLevel) to textFileVar
+

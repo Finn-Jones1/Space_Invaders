@@ -48,9 +48,10 @@ eMY = []
 x_change = 0
 Score = 0
 playerSpeed = 15
+hitList = []
 doublePoints = False
 clusterShot = False
-
+health = 5
 numEnemies = 3
 levelCounter = 1
 eMissileChange = 15
@@ -58,13 +59,13 @@ enemySpeed = 5
 
 
 for i in range(numEnemies):
-    enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
+    enemyImg.append(pygame.image.load(FlexyPath+"/sprites/E1.png"))
     eChangeX.append(enemySpeed)
     eChangeY.append(10)
     Ex.append(100 + enemySpacing * i)
     Ey.append(100)
 
-    eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+    eMissile.append(pygame.image.load(FlexyPath+"/sprites/eMissile.png"))
     eMChangeY.append(eMissileChange)
     eMissileFire.append("ready")
     eMX.append(100)
@@ -73,21 +74,19 @@ for i in range(numEnemies):
 
 
 # Sound Effects
-hitSound = pygame.mixer.Sound(FlexyPath+"/Hit_Hurt.wav")
-click = pygame.mixer.Sound(FlexyPath+"/Blip_Select.wav")
-Shoot = pygame.mixer.Sound(FlexyPath+"/Missile_Shoot.wav")
-Explosion = pygame.mixer.Sound(FlexyPath+"/Explosion.wav")
-hitSound = pygame.mixer.Sound(FlexyPath+"/Hit_Hurt.wav")
+hitSound = pygame.mixer.Sound(FlexyPath+"/sound/Hit_Hurt.wav")
+click = pygame.mixer.Sound(FlexyPath+"/sound/Blip_Select.wav")
+Shoot = pygame.mixer.Sound(FlexyPath+"/sound/Missile_Shoot.wav")
+Explosion = pygame.mixer.Sound(FlexyPath+"/sound/Explosion.wav")
+hitSound = pygame.mixer.Sound(FlexyPath+"/sound/Hit_Hurt.wav")
 
 # Background
-background_image = pygame.image.load(FlexyPath+"/bg.png")
+background_image = pygame.image.load(FlexyPath+"/sprites/bg.png")
 
-pygame.mixer.music.load(FlexyPath+'/music.mp3')
+pygame.mixer.music.load(FlexyPath+'/sound/music.mp3')
 pygame.mixer.music.play(-1)
 
 def save():
-    # global Score
-    # global levelCounter
     global highestScore
     global highestLevel
     f = open(FlexyPath + '/data.txt','w')
@@ -99,19 +98,19 @@ def save():
     f.write(str(highestLevel)+ " " + str(highestScore))
 
 def boom(x,y):
-    screen.blit(pygame.image.load(FlexyPath+"/Boom.png"),(x,y))
+    screen.blit(pygame.image.load(FlexyPath+"/sprites/Boom.png"),(x,y))
 
 def player(x,y):
-    screen.blit(pygame.image.load(FlexyPath+"/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
+    screen.blit(pygame.image.load(FlexyPath+"/sprites/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
 
 def bossEn(x,y):
-    screen.blit(pygame.image.load(FlexyPath+"/BossE.png"), (x,y))
+    screen.blit(pygame.image.load(FlexyPath+"/sprites/BossE.png"), (x,y))
 
 def enemy(x,y,i):
     screen.blit((enemyImg[i]), (x,y))
 
 def fireMisslie(x,y):
-    screen.blit(pygame.image.load(FlexyPath+'/Missile.png'), (x,y))
+    screen.blit(pygame.image.load(FlexyPath+'/sprites/Missile.png'), (x,y))
 
 def eFireMisslie(x,y,i):
     screen.blit((eMissile[i]), (x,y))
@@ -125,8 +124,8 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     screen.blit(finalText, textloc)
 
-def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL, ajustmentsW):
-    if x - hitSizeW < x1 and x + hitSizeL > x1 and y + ajustmentsW > y1 and y - hitSizeL < y1:
+def hitDetect(x,y,x1,y1, hitSizeW, hitSizeL):
+    if x - hitSizeW < x1 and x + hitSizeW > x1 and y + hitSizeL > y1 and y - hitSizeL < y1:
         return True
     else:
         return False
@@ -248,11 +247,13 @@ def gameLoop():
     global playerSpeed
     global doublePoints
     global clusterShot
+    global hitList
+    global health
     BossX = 2000
     BossY = 100
     movementEprevent = 0
     bossChange = -10
-    hitList = []
+    
     x = (display_width * 0.45)
     y = (display_height * 0.8)
     axis = ''
@@ -263,7 +264,7 @@ def gameLoop():
     missileY = 0
     missileY_change = -30
     missileFire = "ready"
-    health = 5
+    
     connectEndLoop = "false"
     boundaries = 0
 
@@ -375,7 +376,7 @@ def gameLoop():
             missileFire = "ready"
 
         if missileFire == "fire":
-            if hitDetect(BossX,BossY, missileX, missileY, 15, 30, 20) is True:
+            if hitDetect(BossX,BossY, missileX, missileY, 30, 30) is True:
                 Explosion.play()
                 boom(BossX, BossY)
                 if doublePoints is True:
@@ -389,7 +390,7 @@ def gameLoop():
             missileY += missileY_change
             for i in range(numEnemies):
                 print("y crossover")
-                if hitDetect(Ex[i],Ey[i], missileX, missileY, 15, 30, 20) is True:
+                if hitDetect(Ex[i],Ey[i], missileX, missileY, 25, 30) is True:
                     if i not in hitList:
                         Explosion.play()
                         boom(Ex[i], Ey[i])
@@ -420,7 +421,7 @@ def gameLoop():
                 Ex[i] += eChangeX[i]
                 enemy(Ex[i],Ey[i], i)
 
-                shootDelay = random.randint(0,300)
+                shootDelay = random.randint(0,250)
 
                 if shootDelay == 1:
                     if eMissileFire[i] != "fire":
@@ -471,12 +472,13 @@ def gameLoop():
                 eMissile.clear()
                 eMX.clear()
                 eMY.clear()
+                health = 5
                 for i in range(numEnemies):
-                    enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
+                    enemyImg.append(pygame.image.load(FlexyPath+"/sprites/E1.png"))
                     eChangeX.append(enemySpeed)
                     Ex.append(100 + enemySpacing * i)
                     Ey.append(100)
-                    eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+                    eMissile.append(pygame.image.load(FlexyPath+"/sprites/eMissile.png"))
                     eMissileFire.append("ready")
                     eMX.append(100)
                     eMY.append(100)
@@ -497,11 +499,11 @@ def gameLoop():
             numEnemies = numEnemies + 2
             x_change = 0
             for i in range(numEnemies):
-                enemyImg.append(pygame.image.load(FlexyPath+"/E1.png"))
+                enemyImg.append(pygame.image.load(FlexyPath+"/sprites/E1.png"))
                 eChangeX.append(enemySpeed)
                 Ex.append(100 + enemySpacing * i)
                 Ey.append(100)
-                eMissile.append(pygame.image.load(FlexyPath+"/eMissile.png"))
+                eMissile.append(pygame.image.load(FlexyPath+"/sprites/eMissile.png"))
                 eMissileFire.append("ready")
                 eMX.append(100)
                 eMY.append(100)
@@ -516,14 +518,14 @@ def gameLoop():
         
 
         
-        showText('Level: ' + str(levelCounter), 50, (500,0), white)
+        
         
         x += x_change
         BossX += bossChange
         player(x,y)
-
-        
         bossEn(BossX, BossY)
+
+        showText('Level: ' + str(levelCounter), 50, (500,0), white)
         showText('Lives: ' + str(health), 50, (700,0), white)
         showText('Score: ' + str(Score), 50, (10,0), white)
 
