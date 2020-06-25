@@ -1,36 +1,48 @@
+# Importing Dependencies
 import pygame, sys, os, random, time, datetime
 from pygame.locals import *
 
+# Starting pygame's clock 
 clock = pygame.time.Clock()
+
+# Initalising Pygame
 pygame.init()
 
+# Flexable path that will allow the space invaders directory to be found on any computer
 FlexyPath = os.path.dirname(os.path.abspath(__file__))
 
+# setting window size
 display_width = 900
 display_height = 700
 
+# Initalising pygame joystick input
 pygame.joystick.init()
 
+# Defining Screen
 screen = pygame.display.set_mode((display_width,display_height))
 
+# Window Title
 pygame.display.set_caption('Space Invaders')
 
+# Colours and their RGB codes
 black = (0,0,0)
 white = (255,255,255)
 grey = (128,128,128)
 lightGrey = (211,211,211)
 
+# Retrieving any saved data from text file
 f=open(FlexyPath + "/data.txt", "r")
 contents = f.read()
 f.close()
 Scontents = contents.split()
 
+# Creating variables to hold the save data
 highestLevel = Scontents[0]
 
 highestScore = Scontents[1]
 
 
-
+# variables for gameplay
 enemySpacing = 50
 enemyImg = []
 Ex = []
@@ -57,7 +69,9 @@ levelCounter = 1
 eMissileChange = 15
 enemySpeed = 5
 
-
+# Creating enemy list depending on numEnemies variable
+# Using a list is a more efficient and simple way than defining the individual enemies
+# It is also creating the individual attributes that come along with the enemy like x and y corordinance
 for i in range(numEnemies):
     enemyImg.append(pygame.image.load(FlexyPath+"/sprites/E1.png"))
     eChangeX.append(enemySpeed)
@@ -73,19 +87,21 @@ for i in range(numEnemies):
     
 
 
-# Sound Effects
+# Defining Sound Effects
 hitSound = pygame.mixer.Sound(FlexyPath+"/sound/Hit_Hurt.wav")
 click = pygame.mixer.Sound(FlexyPath+"/sound/Blip_Select.wav")
 Shoot = pygame.mixer.Sound(FlexyPath+"/sound/Missile_Shoot.wav")
 Explosion = pygame.mixer.Sound(FlexyPath+"/sound/Explosion.wav")
 hitSound = pygame.mixer.Sound(FlexyPath+"/sound/Hit_Hurt.wav")
 
-# Background
+# Background image
 background_image = pygame.image.load(FlexyPath+"/sprites/bg.png")
 
+# Defining and starting music
 pygame.mixer.music.load(FlexyPath+'/sound/music.mp3')
 pygame.mixer.music.play(-1)
 
+# Save Function grabs score, level and checks if it is larger than the previous score if it is then it writes it to the text file.
 def save():
     global highestScore
     global highestLevel
@@ -97,11 +113,15 @@ def save():
 
     f.write(str(highestLevel)+ " " + str(highestScore))
 
+# This function
 def boom(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/sprites/Boom.png"),(x,y))
 
+def largeBoom(x,y):
+    screen.blit(pygame.image.load(FlexyPath+"/sprites/largeBoom.png"),(x,y))
+
 def player(x,y):
-    screen.blit(pygame.image.load(FlexyPath+"/sprites/Player.png"), (x,y))  # We integer divide walkCounr by 3 to ensure each
+    screen.blit(pygame.image.load(FlexyPath+"/sprites/Player.png"), (x,y))
 
 def bossEn(x,y):
     screen.blit(pygame.image.load(FlexyPath+"/sprites/BossE.png"), (x,y))
@@ -221,6 +241,7 @@ def Intro():
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         selection = selection + 1
                         print(selection)
+                        click.play()
                         if len(powerupSelector) == selection:
                             selection = 0
                         pygame.draw.rect(screen,grey,(370,400,170,50))
@@ -452,12 +473,13 @@ def gameLoop():
                         health -= 1
                         hitSound.play()
                         eMissileFire[i] = "ready"
-                        boom(eMX[i],eMY[i])
+                        largeBoom(eMX[i],eMY[i])
                         
                         print("hit")
 
 
-            if health == 0 or Ey[i] > 650 and Ex[i] < 0:
+            if health == 0 or Ey[i] > y and Ex[i] < x:
+                largeBoom(x,y)
                 save()
                 hitList.clear()
                 eChangeX.clear()
@@ -482,7 +504,7 @@ def gameLoop():
                     eMissileFire.append("ready")
                     eMX.append(100)
                     eMY.append(100)
-
+                
                 gameOverScreen()
 
 
