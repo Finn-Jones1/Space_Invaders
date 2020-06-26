@@ -214,7 +214,6 @@ def Intro():
                     elif event.type == pygame.MOUSEBUTTONUP:
                         pygame.draw.rect(screen,white,(404,500,100,50))
                         showText('Start', 30, (420 ,505), black)
-                        print("pressed")
                         gameLoop()
                 else:
                     pygame.draw.rect(screen,white,(404,500,100,50))
@@ -227,7 +226,6 @@ def Intro():
                     showText('Controller '+ controllerStatus, 20, (396 ,610), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         click.play()
-                        print("test")
                         if joyConnect == "true":
                             joyConnect = "false"
                             pygame.draw.rect(screen,grey,(380,600,150,50))
@@ -253,15 +251,12 @@ def Intro():
                     showText(powerupSelector[selection], 15, (402 ,430), black)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         selection = selection + 1
-                        print(selection)
                         click.play()
                         if len(powerupSelector) == selection:
                             selection = 0
                         pygame.draw.rect(screen,grey,(370,400,170,50))
                         showText('Power-up Selector: ', 20, (375 ,405), black)
                         showText(powerupSelector[selection], 15, (402 ,430), black)
-                        
-                        print("change")
             
                 else:
                     pygame.draw.rect(screen,white,(370,400,170,50))
@@ -421,7 +416,6 @@ def gameLoop():
             fireMisslie(missileX,missileY)
             missileY += missileY_change
             for i in range(numEnemies):
-                print("y crossover")
                 # Hit detection for main enemies
                 if hitDetect(Ex[i],Ey[i], missileX, missileY, 25, 30) is True:
                     if i not in hitList:
@@ -492,8 +486,6 @@ def gameLoop():
                         hitSound.play()
                         eMissileFire[i] = "ready"
                         largeBoom(eMX[i]- 20,eMY[i])
-                        
-                        print("hit")
 
 
             # When the player dies all the gameplay variables are reset to default and game over screen is switched to 
@@ -531,7 +523,6 @@ def gameLoop():
             levelCounter += 1
             save()
             enemySpeed = enemySpeed + int(levelCounter)
-            print(numEnemies)
             hitList.clear()
             eChangeX.clear()
             Ex.clear()
