@@ -13,7 +13,7 @@
 
 ## How to play:
 ### With Keyboard:
-- Run the game using python 3 in terminal
+- Run the game using Python 3 in Terminal
 - From the intro screen you can choose which powerup you would like to use. The powerups are:
     - Cluster Shot (Will blow up nearby enemies to the enemy that you hit)
     - Super Speed (Your normal speed is doubled)
