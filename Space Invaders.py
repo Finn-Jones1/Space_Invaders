@@ -30,6 +30,7 @@ grey = (128,128,128)
 lightGrey = (211,211,211)
 
 # Retrieving any saved data from text file
+# Code from previous python text adventure game Life of Dave From Xerox (Adapted)
 f=open(FlexyPath + "/data.txt", "r")
 contents = f.read()
 f.close()
@@ -99,6 +100,7 @@ pygame.mixer.music.load(FlexyPath+'/sound/music.mp3')
 pygame.mixer.music.play(-1)
 
 # Save Function grabs score, level and checks if it is larger than the previous score if it is then it writes it to the text file.
+# Code from previous python text adventure game Life of Dave From Xerox (Adapted)
 def save():
     global highestScore
     global highestLevel
