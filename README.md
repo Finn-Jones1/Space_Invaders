@@ -5,7 +5,7 @@
 
 ## Features:
 - Shooting
-- Collition
+- Collision
 - Powerups
 - Enemies
 - Great Music
